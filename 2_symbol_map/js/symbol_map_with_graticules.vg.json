@@ -1,0 +1,116 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 800,
+    "height": 450,
+    "title": "Flight crashes in the World from 1908 to 2019",
+    "projection": {"type": "equalEarth"},
+    "data": {
+      "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/4_interactive_scatter_plot/data/COVID_19_10_Oct_2020.csv"
+    },
+    
+    "params": [
+      {
+        "name": "Fatalities_Above",
+        "value": 0,
+        "bind": {
+          "input": "range",
+          "min": 0,
+          "max": 500,
+          "step": 1,
+          "name": "Minimum Fatalities: "
+        }
+      }
+      
+    ],
+    "transform": [
+
+
+      {"filter": "datum.'['Fatalities'] > Fatalities_Above"},
+      {
+        "window": [{"op": "rank", "as": "ranking"}],
+        "sort": [{"field": "Fatalities", "order": "descending"}]
+      },
+      {"filter": "datum.ranking == 1"},
+      {
+        "calculate": "'The worst Crash of; the selected period: ' + datum['Fatalities']",
+        "as": "text_annotation_raw"
+      },
+      {
+        "calculate": "split(datum.text_annotation_raw, ';')",
+        "as": "text_annotation"
+      }
+
+    ],
+    "layer": [
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/2_symbol_map/js/WorldMapWithGraticules.topojson",
+          "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+        },
+        "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"}
+      },
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/oceans.topojson",
+          "format": {"type": "topojson", "feature": "oceans"}
+        },
+        "mark": {"type": "geoshape", "fill": "skyblue"}
+      },
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/2_symbol_map/js/WorldMapWithGraticules.topojson",
+          "format": {"type": "topojson", "feature": "ne_110m_graticules_30"}
+        },
+        "mark": {"type": "geoshape", "fill": null, "stroke": "lightgray"}
+      },
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/Kadheegit/Assignment-2/main/FinalData.csv"
+        },
+
+  
+        "mark": {"type": "circle"},
+        "encoding": {
+          
+          
+          "tooltip": [
+            {"field": "Date", "type": "temporal", "title": "Date of the Crash"},
+            {"field": "Time", "type": "temporal", "title": "Time of Crash"},
+            {"field": "Operator", "type": "nominal", "title": "Flight Operator"},
+            {"field": "Flight", "type": "nominal", "title": "Flight"},
+            {"field": "Fatalities", "type": "quantitative", "title": "Number of Fatalities"},
+            {"field": "Summary", "type": "nominal", "title": "Summary of crash"},
+            {"field": "Location", "type": "nominal", "title": "Location of crash"}
+          ],
+          "longitude": {"field": "Longitude", "type": "quantitative"},
+          "latitude": {"field": "Latitude", "type": "quantitative"},
+
+          "size": {
+            "field": "Fatalities",
+            "type": "quantitative",
+            "title": "Fatalities",
+            "scale": {
+            "type": "threshold",
+            "domain": [100,200,300,400,500],
+            "scheme": "reds"
+
+            }           
+          },
+          "color": {
+            "field": "Fatalities",
+            "type": "quantitative",
+            "scale": {
+            "type": "threshold",
+            "domain": [100,200,300,400,500],
+            "scheme": "reds"
+
+            }
+          
+          }
+
+          
+
+        }
+      }
+    ]
+  }
